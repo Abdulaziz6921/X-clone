@@ -93,7 +93,7 @@ A modern, full-featured Twitter (X) clone built with React, Firebase, and Supaba
 1. **Clone the repository**
 
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/Abdulaziz6921/X-clone
    cd twitter-clone
    ```
 
@@ -130,7 +130,7 @@ A modern, full-featured Twitter (X) clone built with React, Firebase, and Supaba
    VITE_GNEWS_API_KEY=your_gnews_api_key
    ```
 
-5. **Supabase Storage Setup (Avatars)**
+5. **Setup Supabase Storage (Avatars)**
 
 6. Create a Supabase project at [supabase.com](https://supabase.com)
 7. Create a bucket called `avatars`
@@ -142,10 +142,11 @@ VITE_SUPABASE_URL=your_supabase_url
 VITE_SUPABASE_ANON_KEY=your_anon_key
 ```
 
-6. **Start the development server**
-   ```bash
-   npm run dev
-   ```
+10. **Start the development server**
+
+```bash
+npm run dev
+```
 
 ---
 
@@ -172,38 +173,48 @@ VITE_SUPABASE_ANON_KEY=your_anon_key
 ```
 src/
 ├── components/
+│ ├── Explore/
+│ │ ├── NewsDetail.jsx
+│ │ ├── Layout/
+│ │ ├── LayOut.jsx
+│ │ ├── MobileSidebar.jsx
+│ │ └── Sidebar.jsx
 │ ├── Tweet/
+│ │ ├── MediaRendered.jsx
+│ │ ├── ReplyModal.jsx
+│ │ ├── ReplyThread.jsx
 │ │ ├── Tweet.jsx
 │ │ ├── TweetComposer.jsx
+│ │ ├── TweetDetail.jsx
 │ │ ├── TweetList.jsx
-│ │ ├── ReplyModal.jsx
-│ │ ├── ReplyThread.jsx ← NEW
-│ └── Layout/
-│ ├── Sidebar.jsx
-│ ├── MobileSidebar.jsx
-│ └── Shared/
-│ └── EmojiPicker.jsx ← NEW
+│ │ └── VerifiedBadge.jsx
+├── config/
+│ ├── firebase.js
+│ └── supabase.js
 ├── contexts/
 │ ├── AuthContext.jsx
 │ ├── ThemeContext.jsx
 │ └── UserCacheContext.jsx ← NEW
 ├── hooks/
-│ └── useTweetHeight.js ← Optional
+│ └── useUserCache.jsx
 ├── pages/
+│ ├── Auth.jsx
+│ ├── Explore.jsx
 │ ├── Home.jsx
 │ ├── Profile.jsx
-│ ├── Explore.jsx
-│ ├── Settings.jsx
-│ └── Auth.jsx
+│ └── Settings.jsx
 ├── services/
+│ ├── newsService.js
 │ ├── tweetService.js
-│ ├── userService.js
-│ └── supabaseService.js ← NEW
-├── config/
-│ ├── firebase.js
-│ └── supabase.js
-└── styles/
-└── index.css
+│ └── userService.js
+├── utils/
+│ ├── number.js
+│ ├── time.js
+├── App.css
+├── App.jsx
+├── index.css
+├── main.jsx
+
 ```
 
 ---
