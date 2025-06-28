@@ -94,7 +94,7 @@ A modern, full-featured Twitter (X) clone built with React, Firebase, and Supaba
 
    ```bash
    git clone https://github.com/Abdulaziz6921/X-clone
-   cd twitter-clone
+   cd X-clone
    ```
 
 2. **Install dependencies**
