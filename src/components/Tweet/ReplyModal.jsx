@@ -1,8 +1,6 @@
 import { useEffect } from "react";
 import TweetComposer from "./TweetComposer";
 import { ArrowLeft, X } from "lucide-react";
-import Tweet from "./Tweet";
-import { Link } from "react-router-dom";
 import ReplyThread from "./ReplyThread";
 
 const ReplyModal = ({ isOpen, onClose, parentTweet }) => {

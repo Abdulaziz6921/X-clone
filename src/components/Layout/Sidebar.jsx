@@ -22,7 +22,6 @@ const Sidebar = () => {
   const { userProfile, logout } = useAuth();
   const { isDark, toggleTheme } = useTheme();
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
-  console.log(userProfile?.avatarUrl);
 
   const handleLogout = async () => {
     try {

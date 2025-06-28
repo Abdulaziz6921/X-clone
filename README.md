@@ -1,45 +1,83 @@
-# Twitter Clone
+# Twitter Clone 🐦
 
-A modern, responsive Twitter clone built with React, Firebase, and Tailwind CSS. This application replicates the core functionality and design of Twitter (X) with real-time features and a clean, intuitive interface.
+A modern, full-featured Twitter (X) clone built with React, Firebase, and Supabase. This application replicates Twitter’s core features including tweets, replies, user profiles, media uploads, real-time updates, and dark mode — with a polished UI and smooth experience.
+
+---
 
 ## 🚀 Features
 
-### Core Functionality
-- **Real-time Tweet Feed**: View and post tweets with live updates
-- **User Authentication**: Firebase Auth with email/password and Google sign-in
-- **User Profiles**: Complete profile pages with follower counts and bio
-- **Tweet Interactions**: Like, retweet, and reply to tweets
-- **Follow System**: Follow and unfollow other users
-- **Responsive Design**: Optimized for mobile, tablet, and desktop
-- **Dark/Light Mode**: Toggle between themes with system preference detection
+### ✅ Core Functionality
 
-### Technical Features
-- **Real Backend**: Firebase Firestore for data persistence
-- **Real-time Updates**: Live tweet feed and interaction updates
-- **Trending Topics**: Integration with GNews API for trending content
-- **Modern UI**: Twitter-inspired design with smooth animations
-- **Mobile-First**: Responsive layout with mobile navigation
-- **Performance Optimized**: Efficient data loading and caching
+- **Tweeting**: Create tweets with text, images, and location
+- **Real-time Feed**: Live updates using Firestore `onSnapshot`
+- **Replies**: Support for threaded replies with modal interface
+- **Like System**: Toggle likes with live count updates
+- **User Profiles**: Bio, location, website, and follower counts
+- **Follow/Unfollow**: Full follow system with counts
+- **Media Support**: Images and videos attached to tweets
+- **Explore Page**: Trending topics from GNews API
+- **Dark/Light Mode**: System-aware theme switching
+- **Responsive**: Optimized for mobile, tablet, and desktop
+
+### 🧠 Advanced UX Enhancements
+
+- **Reply Modal**: Mimics Twitter’s reply modal with parent context
+- **Threaded Replies**: Grouped by parent tweet (like Twitter)
+- **Emoji Picker**: Toggleable emoji picker with click-away backdrop
+- **Supabase Media Uploads**: Avatars stored in Supabase buckets
+- **Geolocation Tweets**: Capture and show user location in tweets
+- **Avatar Preview**: Upload & preview avatar in settings
+- **Cached User Profiles**: Prevents repeated user lookups
+
+---
 
 ## 🛠️ Tech Stack
 
-- **Frontend**: React 18, Vite
-- **Styling**: Tailwind CSS
-- **Backend**: Firebase (Auth + Firestore)
-- **Routing**: React Router DOM
-- **Icons**: Lucide React
-- **Date Handling**: Day.js
-- **HTTP Client**: Axios (for external APIs)
+| Category      | Technology                          |
+| ------------- | ----------------------------------- |
+| Frontend      | React 18 + Vite                     |
+| Styling       | Tailwind CSS + Dark Mode            |
+| Routing       | React Router DOM                    |
+| Auth          | Firebase Authentication             |
+| Database      | Firebase Firestore (Tweets + Users) |
+| Media Storage | Supabase Storage (Avatars/Images)   |
+| Icons         | Lucide React                        |
+| Dates         | Day.js                              |
+| External API  | GNews API (for trending)            |
+| Emoji Picker  | `@emoji-mart/react`                 |
 
-## 📱 Screenshots & Demo
+---
 
-The application features a clean, modern interface that closely matches Twitter's design:
+## 📸 Key Screens & Components
 
-- **Home Feed**: Real-time tweet stream with compose functionality
-- **Profile Pages**: User profiles with tweets, followers, and following counts
-- **Explore Page**: Trending topics and search functionality
-- **Mobile Navigation**: Bottom tab bar and slide-out menu
-- **Dark Mode**: Complete dark theme support
+| Feature           | Description                                     |
+| ----------------- | ----------------------------------------------- |
+| 🏠 Home           | Real-time feed, tweet composer, likes           |
+| 🧑 Profile        | User info, tabs (tweets, replies, media, likes) |
+| 💬 Reply Modal    | Replies with context (parent + threading)       |
+| 📍 Tweet Location | Shows user's geolocation if granted             |
+| 😄 Emoji Picker   | Opens emoji picker with click-away close        |
+| ⚙️ Settings       | Update display name, bio, avatar, etc.          |
+
+---
+
+## 🧪 Latest Implemented Features
+
+- ✅ **Threaded Replies** grouped by parent
+- ✅ **Reusable `ReplyThread`** for both Replies tab and modal
+- ✅ **Reply modal design** replicates Twitter (arrow, replying to)
+- ✅ **Avatar upload** via Supabase bucket `avatars`
+- ✅ **User caching** with `UserCacheContext` + `useUserCache` hook
+- ✅ **Tweet geolocation** using browser `navigator.geolocation`
+- ✅ **Emoji picker** that:
+  - Is mobile-friendly
+  - Opens in correct position
+  - Has backdrop to prevent accidental tweet opening
+  - Closes on outside click
+- ✅ **Vertical line UI** in reply thread (for first reply only)
+- ✅ **Bottom sheet-like reply modal on mobile**
+
+---
 
 ## 🚀 Getting Started
 
@@ -53,28 +91,33 @@ The application features a clean, modern interface that closely matches Twitter'
 ### Installation
 
 1. **Clone the repository**
+
    ```bash
    git clone <repository-url>
    cd twitter-clone
    ```
 
 2. **Install dependencies**
+
    ```bash
    npm install
    ```
 
 3. **Set up Firebase**
+
    - Create a new Firebase project at [Firebase Console](https://console.firebase.google.com)
    - Enable Authentication (Email/Password and Google providers)
    - Create a Firestore database
    - Copy your Firebase config
 
 4. **Set up environment variables**
+
    ```bash
    cp .env.example .env
    ```
-   
+
    Fill in your Firebase configuration and optional GNews API key:
+
    ```env
    VITE_FIREBASE_API_KEY=your_api_key
    VITE_FIREBASE_AUTH_DOMAIN=your_project.firebaseapp.com
@@ -82,160 +125,99 @@ The application features a clean, modern interface that closely matches Twitter'
    VITE_FIREBASE_STORAGE_BUCKET=your_project.appspot.com
    VITE_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
    VITE_FIREBASE_APP_ID=your_app_id
-   
+
    # Optional - for trending topics
    VITE_GNEWS_API_KEY=your_gnews_api_key
    ```
 
-5. **Configure Firestore Security Rules**
-   
-   Add these rules to your Firestore database:
-   ```javascript
-   rules_version = '2';
-   service cloud.firestore {
-     match /databases/{database}/documents {
-       // Users can read/write their own user document
-       match /users/{userId} {
-         allow read, write: if request.auth != null && request.auth.uid == userId;
-         allow read: if request.auth != null;
-       }
-       
-       // Tweets are readable by all authenticated users
-       // Only the author can write/update their tweets
-       match /tweets/{tweetId} {
-         allow read: if request.auth != null;
-         allow create: if request.auth != null && request.auth.uid == resource.data.userId;
-         allow update: if request.auth != null;
-       }
-     }
-   }
-   ```
+5. **Supabase Storage Setup (Avatars)**
+
+6. Create a Supabase project at [supabase.com](https://supabase.com)
+7. Create a bucket called `avatars`
+8. Enable **public access** (or use signed URLs if you prefer)
+9. Copy your `SUPABASE_URL` and `SUPABASE_ANON_KEY` to `.env`
+
+```env
+VITE_SUPABASE_URL=your_supabase_url
+VITE_SUPABASE_ANON_KEY=your_anon_key
+```
 
 6. **Start the development server**
    ```bash
    npm run dev
    ```
 
-7. **Open your browser**
-   
-   Navigate to `http://localhost:5173` to see the application.
-
-### Firebase Setup Details
-
-1. **Authentication**:
-   - Go to Authentication > Sign-in method
-   - Enable Email/Password and Google providers
-
-2. **Firestore Database**:
-   - Create a Firestore database in production mode
-   - Set up the security rules as shown above
-
-3. **Optional - GNews API**:
-   - Get a free API key from [GNews](https://gnews.io)
-   - Add it to your `.env` file for trending topics
+---
 
 ## 📖 Usage
 
 ### Creating an Account
+
 1. Click "Sign up" on the auth page
 2. Fill in your display name, email, and password
 3. Or use "Continue with Google" for quick sign-up
 
 ### Using the App
+
 1. **Post Tweets**: Use the composer at the top of the home feed
 2. **Interact**: Like, retweet, and reply to tweets
 3. **Follow Users**: Visit profiles and click follow
 4. **Explore**: Check trending topics in the Explore section
 5. **Dark Mode**: Toggle theme in the sidebar
 
-## 🏗️ Project Structure
+---
+
+## 📂 Project Structure
 
 ```
 src/
 ├── components/
-│   ├── Layout/
-│   │   ├── Layout.jsx
-│   │   ├── Sidebar.jsx
-│   │   └── MobileSidebar.jsx
-│   ├── Tweet/
-│   │   ├── Tweet.jsx
-│   │   ├── TweetComposer.jsx
-│   │   └── TweetList.jsx
-│   └── ProtectedRoute.jsx
+│ ├── Tweet/
+│ │ ├── Tweet.jsx
+│ │ ├── TweetComposer.jsx
+│ │ ├── TweetList.jsx
+│ │ ├── ReplyModal.jsx
+│ │ ├── ReplyThread.jsx ← NEW
+│ └── Layout/
+│ ├── Sidebar.jsx
+│ ├── MobileSidebar.jsx
+│ └── Shared/
+│ └── EmojiPicker.jsx ← NEW
 ├── contexts/
-│   ├── AuthContext.jsx
-│   └── ThemeContext.jsx
+│ ├── AuthContext.jsx
+│ ├── ThemeContext.jsx
+│ └── UserCacheContext.jsx ← NEW
+├── hooks/
+│ └── useTweetHeight.js ← Optional
 ├── pages/
-│   ├── Home.jsx
-│   ├── Explore.jsx
-│   ├── Profile.jsx
-│   └── Auth.jsx
+│ ├── Home.jsx
+│ ├── Profile.jsx
+│ ├── Explore.jsx
+│ ├── Settings.jsx
+│ └── Auth.jsx
 ├── services/
-│   ├── tweetService.js
-│   ├── userService.js
-│   └── newsService.js
+│ ├── tweetService.js
+│ ├── userService.js
+│ └── supabaseService.js ← NEW
 ├── config/
-│   └── firebase.js
+│ ├── firebase.js
+│ └── supabase.js
 └── styles/
-    └── index.css
+└── index.css
 ```
 
-## 🎨 Design System
-
-The application uses a comprehensive design system inspired by Twitter:
-
-### Colors
-- **Primary**: Twitter Blue (#1DA1F2)
-- **Dark Theme**: Custom dark color palette
-- **Text**: Proper contrast ratios for accessibility
-
-### Typography
-- **Font**: System fonts for optimal performance
-- **Hierarchy**: Clear heading and body text styles
-
-### Components
-- **Buttons**: Consistent styling with hover states
-- **Forms**: Clean input fields with focus states
-- **Cards**: Tweet cards with subtle shadows
+---
 
 ## 🔧 Development
 
 ### Available Scripts
+
 - `npm run dev` - Start development server
 - `npm run build` - Build for production
 - `npm run preview` - Preview production build
 - `npm run lint` - Run ESLint
 
-### Key Features Implementation
-
-1. **Real-time Updates**: Using Firestore's `onSnapshot` for live data
-2. **Responsive Design**: Mobile-first approach with Tailwind breakpoints
-3. **State Management**: Context API for auth and theme state
-4. **Performance**: Optimized with proper React patterns and lazy loading
-
-## 🚀 Deployment
-
-### Building for Production
-```bash
-npm run build
-```
-
-### Deployment Options
-- **Netlify**: Connect your GitHub repo for automatic deployments
-- **Vercel**: Import project and deploy with zero configuration
-- **Firebase Hosting**: Use `firebase deploy` after setting up Firebase CLI
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+---
 
 ## 🙏 Acknowledgments
 
@@ -243,14 +225,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - Firebase for the excellent backend services
 - Tailwind CSS for the utility-first CSS framework
 - Lucide React for the beautiful icons
-
-## 📞 Support
-
-If you have any questions or need help setting up the project:
-
-1. Check the existing issues in the GitHub repository
-2. Create a new issue with detailed information
-3. Join our community discussions
 
 ---
 
