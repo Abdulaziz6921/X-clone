@@ -119,6 +119,8 @@ const Tweet = ({
     setShowReplyModal(false);
   }, []);
 
+  const stopPropagation = (e) => e.stopPropagation();
+
   const tweetClass = useMemo(
     () =>
       `${
@@ -134,10 +136,11 @@ const Tweet = ({
       onClick={() => safeNavigate(`/tweet/${tweet.id}`)}
       className={tweetClass}
     >
-      <div className="flex space-x-3">
+      <div className="flex gap-2 md:gap-3">
         <Link
           to={`/profile/${tweet.username}`}
-          className="w-10 h-10 md:w-12 md:h-12 bg-red-400 rounded-full flex items-center justify-center flex-shrink-0 hover:opacity-90 transition-opacity"
+          onClick={stopPropagation}
+          className="w-9 h-9 md:w-12 md:h-12 bg-red-400 rounded-full flex items-center justify-center flex-shrink-0 hover:opacity-90 transition-opacity"
         >
           {user?.avatarUrl ? (
             <img
@@ -162,6 +165,7 @@ const Tweet = ({
               {!isRepliesTab && (
                 <Link
                   to={`/profile/${tweet.username}`}
+                  onClick={stopPropagation}
                   className="font-semibold text-gray-900 dark:text-dark-text truncate hover:underline"
                 >
                   {tweet.displayName}
@@ -170,6 +174,7 @@ const Tweet = ({
               {tweet.verified && <VerifiedBadge />}
               <Link
                 to={`/profile/${tweet.username}`}
+                onClick={stopPropagation}
                 className="text-gray-500 dark:text-dark-text-secondary"
               >
                 @{tweet.username}
@@ -183,7 +188,10 @@ const Tweet = ({
             </div>
             {!isReplyModal && (
               <div className="ml-auto">
-                <button className="p-1 rounded-full hover:bg-gray-100 dark:hover:bg-dark-bg-tertiary transition-colors">
+                <button
+                  onClick={stopPropagation}
+                  className="p-1 rounded-full hover:bg-gray-100 dark:hover:bg-dark-bg-tertiary transition-colors"
+                >
                   <MoreHorizontal className="h-5 w-5 text-gray-500 dark:text-dark-text-secondary" />
                 </button>
               </div>
@@ -274,7 +282,7 @@ const Tweet = ({
               </button>
 
               <button
-                onClick={(e) => e.stopPropagation()}
+                onClick={stopPropagation}
                 className="flex items-center space-x-2 text-gray-500 dark:text-dark-text-secondary hover:text-twitter-blue transition-colors group"
               >
                 <div className="p-2 rounded-full group-hover:bg-twitter-blue/10 transition-colors">

@@ -3,7 +3,7 @@ import { useAuth } from "../contexts/AuthContext";
 import { doc, updateDoc } from "firebase/firestore";
 import { db } from "../config/firebase";
 import { supabase } from "../config/supabase";
-import NoUser from "../assets/5100711-200.png";
+import NoUser from "../assets/No-user.png";
 
 const SettingsPage = () => {
   const { currentUser, userProfile, fetchUserProfile } = useAuth();

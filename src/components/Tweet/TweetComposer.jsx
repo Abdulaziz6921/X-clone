@@ -43,13 +43,52 @@ const TweetComposer = ({
 
   const handleFilesSelect = (e) => {
     const files = Array.from(e.target.files);
-    setSelectedFiles((prev) => [...prev, ...files]);
+    let newFiles = [...selectedFiles];
+    let newPreviews = [...previews];
 
-    const filePreviews = files.map((file) => ({
-      url: URL.createObjectURL(file),
-      type: file.type.startsWith("video") ? "video" : "image",
-    }));
-    setPreviews((prev) => [...prev, ...filePreviews]);
+    // Separate new files by type
+    const newImages = files.filter((f) => f.type.startsWith("image/"));
+    const newVideos = files.filter((f) => f.type.startsWith("video/"));
+
+    const existingImages = newFiles.filter((f) => f.type.startsWith("image/"));
+    const existingVideos = newFiles.filter((f) => f.type.startsWith("video/"));
+
+    // Preventing mixing images and videos
+    if (
+      (existingVideos.length > 0 && newImages.length > 0) ||
+      (existingImages.length > 0 && newVideos.length > 0)
+    ) {
+      alert("You can’t attach images and videos together.");
+      return;
+    }
+
+    // Limit 4 images max
+    if (newImages.length > 0 && existingImages.length + newImages.length > 4) {
+      alert("You can only upload up to 4 images.");
+      return;
+    }
+
+    // Limit 1 video max
+    if (newVideos.length > 0 && existingVideos.length + newVideos.length > 1) {
+      alert("You can only upload one video.");
+      return;
+    }
+
+    // ✅ Add new valid files
+    newFiles = [...newFiles, ...files];
+    newPreviews = [
+      ...newPreviews,
+      ...files.map((file) => ({
+        url: URL.createObjectURL(file),
+        type: file.type.startsWith("video") ? "video" : "image",
+      })),
+    ];
+
+    setSelectedFiles(newFiles);
+    setPreviews(newPreviews);
+
+    // Reset file input (so same file can be reselected if removed)
+    e.target.value = "";
   };
 
   const removeFile = (index) => {
@@ -226,7 +265,7 @@ const TweetComposer = ({
       }`}
     >
       <form onSubmit={handleSubmit}>
-        <div className="flex space-x-3 ">
+        <div className="flex gap-2 md:gap-3">
           <div className="w-10 h-10 md:w-12 md:h-12 bg-twitter-blue rounded-full overflow-hidden flex items-center justify-center flex-shrink-0 ">
             {userProfile?.avatarUrl ? (
               <img
@@ -241,7 +280,7 @@ const TweetComposer = ({
             )}
           </div>
 
-          <div className="flex-1 ">
+          <div className="flex-1">
             <textarea
               ref={textareaRef}
               onInput={handleInput}
@@ -301,11 +340,11 @@ const TweetComposer = ({
             </div>
 
             <div
-              className={`flex items-center justify-between mt-4 ${
+              className={`flex items-center justify-between mt-1 md:mt-4 ${
                 isReplyModal && "absolute left-0 bottom-1 w-fit h-fit"
               } `}
             >
-              <div className="flex space-x-4 items-center">
+              <div className="flex items-center gap-1 md:gap-4">
                 <button
                   type="button"
                   onClick={() => fileInputRef.current.click()}
@@ -407,8 +446,8 @@ const TweetComposer = ({
                 >
                   {isLoading
                     ? isReplyModal
-                      ? "Replying..."
-                      : "Tweeting..."
+                      ? "....."
+                      : "....."
                     : isReplyModal
                     ? "Reply"
                     : "Tweet"}

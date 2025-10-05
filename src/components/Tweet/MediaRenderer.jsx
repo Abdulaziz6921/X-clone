@@ -10,58 +10,65 @@ const MediaRenderer = ({ mediaUrls }) => {
       ? "image"
       : null;
 
+  const handleMediaClick = (e, url, type) => {
+    e.stopPropagation();
+    e.preventDefault();
+    // Pausing any video if clicked
+    if (type === "video" && e.target.tagName === "VIDEO") {
+      e.target.pause();
+      e.target.currentTime = 0;
+    }
+    setSelectedMedia(url);
+  };
+
   const renderMediaItem = (url, index) => {
     const [error, setError] = useState(false);
     const type = getType(url);
-    const isLastThree = mediaUrls.length === 3 && index === 2;
-    const baseClass = `rounded-lg border object-cover w-full h-full ${
-      isLastThree ? "col-span-2" : ""
-    }`;
 
     if (error) {
       return (
         <div
           key={index}
-          className={`flex items-center justify-center md:text-2xl text-sm text-red-500 bg-gray-100 dark:bg-dark-bg-secondary h-48 border rounded-md ${
-            isLastThree ? "col-span-2" : ""
-          }`}
+          className="flex items-center justify-center text-red-500 bg-gray-100 dark:bg-dark-bg-secondary h-48 border rounded-md"
         >
           {type === "video" ? "Video not available" : "Image not available"}
         </div>
       );
     }
 
-    if (type === "video") {
-      return (
-        <video
-          key={index}
-          src={url}
-          controls
-          className={`max-h-96 ${baseClass}`}
-          onError={() => setError(true)}
-          onClick={() => setSelectedMedia(url)}
-        />
-      );
-    }
+    const isThreeGrid = mediaUrls.length === 3 && index === 2;
 
-    if (type === "image") {
-      return (
-        <img
-          key={index}
-          src={url}
-          alt={`media-${index}`}
-          className={baseClass}
-          loading="lazy"
-          onError={() => setError(true)}
-          onClick={() => setSelectedMedia(url)}
-        />
-      );
-    }
+    const commonClass = `
+      w-full h-full object-cover rounded-xl border
+      ${isThreeGrid ? "col-span-2" : ""}
+      aspect-[4/5] max-h-[512px] overflow-hidden cursor-pointer
+    `;
 
-    return null;
+    return type === "video" ? (
+      <video
+        key={index}
+        src={url}
+        className={commonClass}
+        controls
+        muted
+        playsInline
+        onClick={(e) => handleMediaClick(e, url, type)}
+        onError={() => setError(true)}
+      />
+    ) : (
+      <img
+        key={index}
+        src={url}
+        alt={`media-${index}`}
+        className={commonClass}
+        loading="lazy"
+        onClick={(e) => handleMediaClick(e, url, type)}
+        onError={() => setError(true)}
+      />
+    );
   };
 
-  const cols =
+  const gridCols =
     mediaUrls.length === 1
       ? "grid-cols-1"
       : mediaUrls.length === 2
@@ -72,29 +79,39 @@ const MediaRenderer = ({ mediaUrls }) => {
 
   return (
     <>
-      <div className={`my-3 gap-2 grid ${cols}`}>
+      {/* Media Grid */}
+      <div className={`my-3 grid gap-2 ${gridCols}`}>
         {mediaUrls.map((url, i) => renderMediaItem(url, i))}
       </div>
 
+      {/* Full Media Viewer */}
       {selectedMedia && (
         <div
           className="fixed inset-0 bg-black bg-opacity-80 z-50 flex items-center justify-center"
-          onClick={() => setSelectedMedia(null)}
+          onClick={(e) => {
+            e.stopPropagation();
+            setSelectedMedia(null);
+          }}
         >
-          {/\.(mp4|webm|ogg)$/i.test(selectedMedia) ? (
-            <video
-              src={selectedMedia}
-              controls
-              autoPlay
-              className="max-h-[90vh] rounded-lg shadow-lg"
-            />
-          ) : (
-            <img
-              src={selectedMedia}
-              alt="Full media"
-              className="max-h-[90vh] rounded-lg shadow-lg"
-            />
-          )}
+          <div
+            className="max-h-[90vh] max-w-[90vw] rounded-xl overflow-hidden shadow-xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/\.(mp4|webm|ogg)$/i.test(selectedMedia) ? (
+              <video
+                src={selectedMedia}
+                controls
+                autoPlay
+                className="max-h-[90vh] max-w-[90vw] rounded-xl"
+              />
+            ) : (
+              <img
+                src={selectedMedia}
+                alt="Full view"
+                className="max-h-[90vh] max-w-[90vw] rounded-xl"
+              />
+            )}
+          </div>
         </div>
       )}
     </>
