@@ -50,14 +50,13 @@ import axios from "axios";
 
 const API_KEY = import.meta.env.VITE_GNEWS_API_KEY;
 const BASE_URL = "https://gnews.io/api/v4";
-const api = axios.create({ baseURL: BASE_URL });
 
 /**
- * Helper for API requests
+ * Generic fetch helper (uses full URL)
  */
 const fetchNews = async (endpoint, params = {}) => {
   try {
-    const { data } = await api.get(endpoint, {
+    const { data } = await axios.get(`${BASE_URL}${endpoint}`, {
       params: { token: API_KEY, lang: "en", max: 10, ...params },
     });
     return data.articles || [];
@@ -68,13 +67,12 @@ const fetchNews = async (endpoint, params = {}) => {
 };
 
 /**
- * Fetching trending news
+ * Trending news
  */
 export const getTrendingNews = async () => {
   const articles = await fetchNews("/top-headlines", { country: "us" });
 
   if (!articles.length) {
-    // fallback data
     return [
       { title: "Technology", description: "Latest in tech innovation" },
       { title: "Sports", description: "Breaking sports news" },
@@ -88,7 +86,7 @@ export const getTrendingNews = async () => {
 };
 
 /**
- * Searching news by query
+ * Search news
  */
 export const searchNews = (query) => {
   if (!query?.trim()) return [];
