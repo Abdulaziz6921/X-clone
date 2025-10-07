@@ -1,5 +1,3 @@
-import fetch from "node-fetch";
-
 export async function handler(event) {
   const API_KEY = process.env.VITE_GNEWS_API_KEY;
   const BASE_URL = "https://gnews.io/api/v4/top-headlines";
