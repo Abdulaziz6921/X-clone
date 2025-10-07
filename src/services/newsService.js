@@ -1,51 +1,52 @@
-import axios from "axios";
+// import axios from "axios";
 
-const API_KEY = import.meta.env.VITE_GNEWS_API_KEY;
-const BASE_URL = "https://gnews.io/api/v4";
+// const API_KEY = import.meta.env.VITE_GNEWS_API_KEY;
+// const BASE_URL = "https://gnews.io/api/v4";
 
-export const getTrendingNews = async () => {
-  try {
-    const response = await axios.get(`${BASE_URL}/top-headlines`, {
-      params: {
-        token: API_KEY,
-        lang: "en",
-        country: "us",
-        max: 10,
-      },
-    });
-    return response.data.articles;
-  } catch (error) {
-    console.error("Error fetching trending news:", error);
-    // Fallback if the API call fails
-    return [
-      { title: "Technology", description: "Latest in tech innovation" },
-      { title: "Sports", description: "Breaking sports news" },
-      { title: "Politics", description: "Political updates" },
-      { title: "Entertainment", description: "Entertainment buzz" },
-      { title: "Science", description: "Scientific discoveries" },
-    ];
-  }
-};
+// export const getTrendingNews = async () => {
+//   try {
+//     const response = await axios.get(`${BASE_URL}/top-headlines`, {
+//       params: {
+//         token: API_KEY,
+//         lang: "en",
+//         country: "us",
+//         max: 10,
+//       },
+//     });
+//     return response.data.articles;
+//   } catch (error) {
+//     console.error("Error fetching trending news:", error);
+//     // Fallback if the API call fails
+//     return [
+//       { title: "Technology", description: "Latest in tech innovation" },
+//       { title: "Sports", description: "Breaking sports news" },
+//       { title: "Politics", description: "Political updates" },
+//       { title: "Entertainment", description: "Entertainment buzz" },
+//       { title: "Science", description: "Scientific discoveries" },
+//     ];
+//   }
+// };
 
-/**
- * Fetching news based on search query
- */
-export const searchNews = async (query) => {
-  try {
-    const response = await axios.get(`${BASE_URL}/search`, {
-      params: {
-        token: API_KEY,
-        q: query,
-        lang: "en",
-        max: 10,
-      },
-    });
-    return response.data.articles;
-  } catch (error) {
-    console.error(`Error searching news for "${query}":`, error);
-    return [];
-  }
-};
+// /**
+//  * Fetching news based on search query
+//  */
+// export const searchNews = async (query) => {
+//   try {
+//     const response = await axios.get(`${BASE_URL}/search`, {
+//       params: {
+//         token: API_KEY,
+//         q: query,
+//         lang: "en",
+//         max: 10,
+//       },
+//     });
+//     return response.data.articles;
+//   } catch (error) {
+//     console.error(`Error searching news for "${query}":`, error);
+//     return [];
+//   }
+// };
+
 // import axios from "axios";
 
 // const API_KEY = import.meta.env.VITE_GNEWS_API_KEY;
@@ -94,3 +95,56 @@ export const searchNews = async (query) => {
 //   if (!query?.trim()) return [];
 //   return fetchNews("/search", { q: query });
 // };
+
+import axios from "axios";
+
+const API_KEY = import.meta.env.VITE_GNEWS_API_KEY;
+const BASE_URL = "https://gnews.io/api/v4";
+
+/**
+ * Detect if running on Netlify (production)
+ */
+const isNetlify = window.location.hostname.includes("netlify.app");
+
+/**
+ * Universal fetch function
+ */
+const fetchNews = async (endpoint, params = {}) => {
+  try {
+    if (isNetlify) {
+      // ✅ In Netlify, use serverless function (CORS-safe)
+      const response = await fetch("/.netlify/functions/news");
+      const data = await response.json();
+      return data.articles || [];
+    } else {
+      // ✅ Locally, call API directly (works in dev)
+      const { data } = await axios.get(`${BASE_URL}${endpoint}`, {
+        params: { token: API_KEY, lang: "en", max: 10, ...params },
+      });
+      return data.articles || [];
+    }
+  } catch (error) {
+    console.error(`Error fetching news: ${error.message}`);
+    return [
+      { title: "Technology", description: "Latest in tech innovation" },
+      { title: "Sports", description: "Breaking sports news" },
+      { title: "Politics", description: "Political updates" },
+      { title: "Entertainment", description: "Entertainment buzz" },
+      { title: "Science", description: "Scientific discoveries" },
+    ];
+  }
+};
+
+/**
+ * Get trending news
+ */
+export const getTrendingNews = () =>
+  fetchNews("/top-headlines", { country: "us" });
+
+/**
+ * Search news
+ */
+export const searchNews = (query) => {
+  if (!query?.trim()) return [];
+  return fetchNews("/search", { q: query });
+};
