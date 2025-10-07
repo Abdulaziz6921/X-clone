@@ -109,22 +109,25 @@ const isNetlify = window.location.hostname.includes("netlify.app");
 /**
  * Universal fetch function
  */
-const fetchNews = async (endpoint, params = {}) => {
+const fetchNews = async (params = {}, endpoint = "/top-headlines") => {
   try {
     if (isNetlify) {
-      // ✅ In Netlify, use serverless function (CORS-safe)
-      const response = await fetch("/.netlify/functions/news");
+      // ✅ Build query string for serverless function
+      const query = new URLSearchParams(params).toString();
+      const url = `/.netlify/functions/news${query ? `?${query}` : ""}`;
+
+      const response = await fetch(url);
       const data = await response.json();
       return data.articles || [];
     } else {
-      // ✅ Locally, call API directly (works in dev)
+      // ✅ Local dev: direct API call
       const { data } = await axios.get(`${BASE_URL}${endpoint}`, {
         params: { token: API_KEY, lang: "en", max: 10, ...params },
       });
       return data.articles || [];
     }
   } catch (error) {
-    console.error(`Error fetching news: ${error.message}`);
+    console.error(`❌ Error fetching news: ${error.message}`);
     return [
       { title: "Technology", description: "Latest in tech innovation" },
       { title: "Sports", description: "Breaking sports news" },
@@ -136,15 +139,15 @@ const fetchNews = async (endpoint, params = {}) => {
 };
 
 /**
- * Get trending news
+ * 📰 Get trending news
  */
 export const getTrendingNews = () =>
-  fetchNews("/top-headlines", { country: "us" });
+  fetchNews({ country: "us" }, "/top-headlines");
 
 /**
- * Search news
+ * 🔍 Search news
  */
 export const searchNews = (query) => {
   if (!query?.trim()) return [];
-  return fetchNews("/search", { q: query });
+  return fetchNews({ q: query }, "/search");
 };
