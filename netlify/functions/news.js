@@ -2,28 +2,30 @@ export async function handler(event) {
   const API_KEY = process.env.VITE_GNEWS_API_KEY;
   const BASE_URL = "https://gnews.io/api/v4";
 
-  // Extract query params (like ?q=elon)
-  const { q } = event.queryStringParameters;
+  // Get all query parameters, not just q
+  const params = new URLSearchParams(event.queryStringParameters || {});
+  const q = params.get("q");
 
-  // Decide which endpoint to use
+  // Decide endpoint
   const endpoint = q ? "/search" : "/top-headlines";
 
-  // Build final URL
-  const url = q
-    ? `${BASE_URL}${endpoint}?q=${encodeURIComponent(
-        q
-      )}&lang=en&max=10&token=${API_KEY}`
-    : `${BASE_URL}${endpoint}?lang=en&country=us&max=10&token=${API_KEY}`;
+  // Build the full URL dynamically
+  const url = new URL(`${BASE_URL}${endpoint}`);
+  url.search = params.toString(); // includes q, country, etc.
+  url.searchParams.set("token", API_KEY);
+  url.searchParams.set("lang", "en");
+  url.searchParams.set("max", "10");
+  if (!q) url.searchParams.set("country", "us");
 
   try {
-    const response = await fetch(url);
+    const response = await fetch(url.toString());
     const data = await response.json();
 
     return {
       statusCode: 200,
       body: JSON.stringify(data),
       headers: {
-        "Access-Control-Allow-Origin": "*", // ✅ CORS fix
+        "Access-Control-Allow-Origin": "*",
         "Access-Control-Allow-Methods": "GET",
       },
     };
